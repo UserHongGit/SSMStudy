@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:aop="http://www.springframework.org/schema/aop"
+       xmlns:tx="http://www.springframework.org/schema/tx"
+       xmlns:jdbc="http://www.springframework.org/schema/jdbc"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:task="http://www.springframework.org/schema/task"
+       xmlns:util="http://www.springframework.org/schema/util"
+       xsi:schemaLocation="
+     http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.0.xsd
+     http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+     http://www.springframework.org/schema/jdbc http://www.springframework.org/schema/jdbc/spring-jdbc-3.0.xsd
+     http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-3.0.xsd
+     http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-3.0.xsd
+     http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-3.0.xsd
+    http://www.springframework.org/schema/task http://www.springframework.org/schema/task/spring-task.xsd">
+    <!--Spring的配置文件,主要配置和业务逻辑有关的东西-->
+    <!--Spring配置的核心点,  数据源,与Mybatis的整和,事务控制-->
+
+
+    <!--配置组件扫描-->
+    <!--和SpringMVC配置文件扫描不同的是:springmvc来扫描控制器,而这个配置文件除了控制器剩下的业务逻辑组件都要-->
+    <context:component-scan base-package="com.atguigu">
+        <context:exclude-filter type="annotation" expression="org.springframework.stereotype.Controller"/>
+    </context:component-scan>
+
+
+
+
+
+    <!--引入db配置文件-->
+    <context:property-placeholder location="classpath:db.properties"/>
+    <!--数据库 ,事务控制...核心业务配置-->
+    <bean
+        id="pooledDataSource"
+        class="com.mchange.v2.c3p0.ComboPooledDataSource"
+        >
+        <property name="jdbcUrl" value="${jdbc.jdbcUrl}"></property>
+        <property name="driverClass" value="${jdbc.driverClass}"></property>
+        <property name="user" value="${jdbc.user}"></property>
+        <property name="password" value="${jdbc.password}"></property>
+    </bean>
+
+
+
+
+    <!--====================================Mybatis的整和配置===================-->
+    <!--配置和Mybatis的整和-->
+    <bean
+        id="sqlSessionFactory"
+        class="org.mybatis.spring.SqlSessionFactoryBean"
+        >
+        <!--指定mybatis全局配置文件的位置-->
+        <property name="configLocation" value="classpath:mybatis-config.xml"></property>
+        <property name="dataSource" ref="pooledDataSource"></property>
+        <!--指定mybatis,  mapper.xml文件的位置-->
+        <property name="mapperLocations" value="classpath:mapper/*.xml"></property>
+    </bean>
+
+    <!--配置扫描器,将mybatis接口的实现加入到IOC容器中-->
+    <bean
+        class="org.mybatis.spring.mapper.MapperScannerConfigurer"
+        >
+        <!--扫描所有的dao接口的实现,加入到IOC容器中-->
+        <property name="basePackage" value="com.atguigu.curd.dao"></property>
+    </bean>
+    <!--====================================Mybatis的整和配置===================-->
+
+
+
+
+
+    <!--====================================事务的配置===================-->
+    <!--事务控制的配置-->
+    <bean
+        id="transactionManager"
+        class="org.springframework.jdbc.datasource.DataSourceTransactionManager"
+        >
+        <!--控制住数据源-->
+        <property name="dataSource" ref="pooledDataSource"></property>
+    </bean>
+
+    <!--开启基于注解的事务,也可以使用xml配置形式的事务(主要是使用配置式控制)-->
+    <aop:config>
+        <!--切入点表达式  切入哪些方法  那些方法会被事务监控-->
+        <aop:pointcut id="txPointCut" expression="execution(* com.atguigu.curd.service..*(..))"/>
+        <!--配置事务增强器-->
+        <aop:advisor advice-ref="txAdvice" pointcut-ref="txPointCut"></aop:advisor>
+
+    </aop:config>
+
+    <!--配置事务增强器,  事务如何切入  切入之后方法该怎么办就看这个配置-->
+    <tx:advice id="txAdvice">
+        <tx:attributes>
+            <!--代表切入点切入的所有方法都是事务方法-->
+            <tx:method name="*"/>
+            <!--以get开头所有的放发都是事务方法, 比如说get所有的方法都是查询,配置readonly就可以进行优化-->
+            <tx:method name="get*" read-only="true"/>
+        </tx:attributes>
+
+    </tx:advice>
+    <!--====================================事务的配置===================-->
+
+
+    <!--为了测试使用-->
+    <!--配置一个可以执行批量的sqlSession-->
+    <bean
+        class="org.mybatis.spring.SqlSessionTemplate"
+         >
+        <constructor-arg name="sqlSessionFactory" ref="sqlSessionFactory"></constructor-arg>
+        <constructor-arg name="executorType" value="BATCH"></constructor-arg>
+    </bean>
+
+
+</beans>

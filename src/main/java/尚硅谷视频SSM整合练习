@@ -1,0 +1,68 @@
+SQL文件:
+
+SET FOREIGN_KEY_CHECKS=0;
+
+-- ----------------------------
+-- Table structure for tbl_dept
+-- ----------------------------
+DROP TABLE IF EXISTS `tbl_dept`;
+CREATE TABLE `tbl_dept` (
+  `dept_id` int(11) NOT NULL AUTO_INCREMENT,
+  `dept_name` varchar(255) NOT NULL,
+  PRIMARY KEY (`dept_id`)
+) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8;
+
+-- ----------------------------
+-- Table structure for tbl_emp
+-- ----------------------------
+DROP TABLE IF EXISTS `tbl_emp`;
+CREATE TABLE `tbl_emp` (
+  `emp_id` int(11) NOT NULL AUTO_INCREMENT,
+  `emp_name` varchar(255) NOT NULL,
+  `gender` char(1) DEFAULT NULL,
+  `email` varchar(255) DEFAULT NULL,
+  `d_id` int(11) DEFAULT NULL,
+  PRIMARY KEY (`emp_id`)
+) ENGINE=InnoDB AUTO_INCREMENT=1009 DEFAULT CHARSET=utf8;
+SET FOREIGN_KEY_CHECKS=1;
+
+
+
+
+test中JUnit的单元测试
+util中Mybatis的逆向工程
+
+
+
+applicationContext.xml Spring的核心配置
+dispatcher-servlet.xml  Spring MVC的核心配置
+web.xml   项目的核心配置
+pom.xml   依赖的核心配置
+generatorConfig.xml    逆向工程的核心配置
+
+
+list.jsp
+    页面发送请求直接返回页面的测试
+list2.jsp
+    整个视频学习的全部文件
+        包含
+            用户输入表单格式的校验
+            Ajax提交REST风格需要注意的事,以及方法
+            用户的增删改查,分页,批量删除等
+list4.jsp
+    包含
+        用户的新增
+        表单的前端验证
+        用户表单提交的后端JSR303验证
+list5.jsp
+    包含
+        员工录入后的编辑操作以及表单的验证
+
+
+
+
+
+
+
+
+
